@@ -1,0 +1,25 @@
+[project]
+name = "edu-multiagent-platform"
+version = "0.1.0"
+description = "LangGraph multi-agent learning, QA, quiz, and research platform"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115,<1", "uvicorn[standard]>=0.32,<1", "pydantic>=2.9,<3", "pydantic-settings>=2.6,<3",
+  "langgraph>=0.2,<2", "langchain-core>=0.3,<2", "langchain-google-genai>=2,<4",
+  "httpx>=0.27,<1", "redis>=5,<7", "sqlalchemy>=2,<3", "psycopg[binary]>=3.2,<4",
+  "neo4j>=5.25,<7", "chromadb>=0.5,<2", "qdrant-client>=1.12,<2", "boto3>=1.35,<2",
+  "python-jose[cryptography]>=3.3,<4", "structlog>=24,<26", "tenacity>=9,<10",
+  "opentelemetry-api>=1.28,<2", "opentelemetry-sdk>=1.28,<2", "opentelemetry-instrumentation-fastapi>=0.49b0,<1",
+  "prometheus-client>=0.21,<1"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "pytest-asyncio>=0.24,<1", "ruff>=0.8,<1", "mypy>=1.13,<2"]
+ui = ["streamlit>=1.40,<2"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100

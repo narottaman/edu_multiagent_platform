@@ -1,0 +1,6 @@
+aws_region = "us-west-2"
+project = "edu-multiagent"
+environment = "dev"
+cluster_version = "1.31"
+node_instance_types = ["m6i.large"]
+desired_nodes = 2

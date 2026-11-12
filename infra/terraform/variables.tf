@@ -1,0 +1,9 @@
+variable "aws_region" { type = string; default = "us-west-2" }
+variable "project" { type = string; default = "edu-multiagent" }
+variable "environment" { type = string; default = "dev" }
+variable "vpc_cidr" { type = string; default = "10.42.0.0/16" }
+variable "cluster_version" { type = string; default = "1.31" }
+variable "node_instance_types" { type = list(string); default = ["m6i.large"] }
+variable "desired_nodes" { type = number; default = 2 }
+variable "min_nodes" { type = number; default = 2 }
+variable "max_nodes" { type = number; default = 5 }

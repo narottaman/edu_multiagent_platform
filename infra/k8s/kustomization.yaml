@@ -1,0 +1,7 @@
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - api.yaml
+  - ui.yaml
+  - hpa.yaml
+# Add gateway.yaml after replacing its placeholders and installing a Gateway controller.

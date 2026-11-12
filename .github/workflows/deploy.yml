@@ -1,0 +1,52 @@
+name: Deploy Kubernetes
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment to deploy
+        required: true
+        default: dev
+        type: choice
+        options: [dev, staging, production]
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+env:
+  REGISTRY: ghcr.io
+  API_IMAGE: ghcr.io/${{ github.repository_owner }}/edu-multiagent
+  UI_IMAGE: ghcr.io/${{ github.repository_owner }}/edu-multiagent-ui
+jobs:
+  deploy:
+    environment: ${{ inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with: {context: ., push: true, tags: "${{ env.API_IMAGE }}:${{ github.sha }}"}
+      - uses: docker/build-push-action@v6
+        with: {context: ./frontend, push: true, tags: "${{ env.UI_IMAGE }}:${{ github.sha }}"}
+      # Recommended: configure cloud OIDC instead of long-lived cloud keys.
+      # AWS example: add aws-actions/configure-aws-credentials and set AWS_ROLE_ARN + AWS_REGION.
+      - name: Configure kubeconfig from GitHub secret
+        env: {KUBE_CONFIG_DATA: "${{ secrets.KUBE_CONFIG_DATA }}"}
+        run: |
+          test -n "$KUBE_CONFIG_DATA"
+          mkdir -p "$HOME/.kube"
+          echo "$KUBE_CONFIG_DATA" | base64 -d > "$HOME/.kube/config"
+      - uses: azure/setup-kubectl@v4
+      - name: Deploy
+        run: |
+          kubectl apply -k infra/k8s
+          kubectl -n edu-ai set image deployment/edu-api api=${API_IMAGE}:${GITHUB_SHA}
+          kubectl -n edu-ai set image deployment/edu-ui ui=${UI_IMAGE}:${GITHUB_SHA}
+          kubectl -n edu-ai rollout status deployment/edu-api --timeout=180s
+          kubectl -n edu-ai rollout status deployment/edu-ui --timeout=180s

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: edu-ui, namespace: edu-ai}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: edu-ui}}
+  template:
+    metadata: {labels: {app: edu-ui}}
+    spec:
+      containers:
+        - name: ui
+          image: ghcr.io/REPLACE_OWNER/edu-multiagent-ui:latest
+          env: [{name: API_URL, value: http://edu-api}]
+          ports: [{containerPort: 8501}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: edu-ui, namespace: edu-ai}
+spec:
+  selector: {app: edu-ui}
+  ports: [{port: 80, targetPort: 8501}]

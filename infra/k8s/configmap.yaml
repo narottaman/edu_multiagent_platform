@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: edu-ai-config, namespace: edu-ai}
+data:
+  APP_ENV: production
+  MOCK_MODE: "false"
+  RAG_SERVICE_URL: http://rag-service:8010
+  REDIS_URL: redis://redis:6379/0
+  GEMINI_MODEL: gemini-2.5-flash
+  GEMINI_RESEARCH_MODEL: gemini-2.5-pro

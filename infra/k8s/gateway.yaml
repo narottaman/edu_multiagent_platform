@@ -1,0 +1,25 @@
+# Requires a Gateway API controller (for example AWS Load Balancer Controller/NGINX/Envoy Gateway).
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata: {name: edu-gateway, namespace: edu-ai}
+spec:
+  gatewayClassName: REPLACE_GATEWAY_CLASS
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: REPLACE_DOMAIN
+      tls:
+        mode: Terminate
+        certificateRefs: [{kind: Secret, name: edu-tls}]
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: {name: edu-route, namespace: edu-ai}
+spec:
+  parentRefs: [{name: edu-gateway}]
+  hostnames: ["REPLACE_DOMAIN"]
+  rules:
+    - matches: [{path: {type: PathPrefix, value: /api}}]
+      backendRefs: [{name: edu-api, port: 80}]
+    - backendRefs: [{name: edu-ui, port: 80}]

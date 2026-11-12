@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: edu-api, namespace: edu-ai}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: edu-api}}
+  template:
+    metadata: {labels: {app: edu-api}}
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/REPLACE_OWNER/edu-multiagent:latest
+          ports: [{containerPort: 8000}]
+          envFrom:
+            - configMapRef: {name: edu-ai-config}
+            - secretRef: {name: edu-ai-secrets}
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          readinessProbe: {httpGet: {path: /readyz, port: 8000}, initialDelaySeconds: 5, periodSeconds: 10}
+          livenessProbe: {httpGet: {path: /healthz, port: 8000}, initialDelaySeconds: 15, periodSeconds: 20}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: edu-api, namespace: edu-ai}
+spec:
+  selector: {app: edu-api}
+  ports: [{port: 80, targetPort: 8000}]
